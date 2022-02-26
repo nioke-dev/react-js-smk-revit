@@ -4,11 +4,24 @@ import Main from "./Main";
 import Nav from "./Nav";
 import Side from "./Side";
 
+import { Redirect, useHistory } from "react-router-dom";
+
 const Back = () => {
+  let history = useHistory();
+  console.log(sessionStorage.getItem("token"));
+
+  if (
+    sessionStorage.getItem("token") === "undefined" ||
+    sessionStorage.getItem("token") === null
+  ) {
+    return <Redirect to="/login" />;
+    // return history.goBack();
+  }
+
   return (
     <div>
       <div className="row">
-        <div>
+        <div className="col-12">
           <Nav />
         </div>
       </div>

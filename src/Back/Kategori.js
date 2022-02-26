@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { link } from "../Axios/link";
 import { useForm } from "react-hook-form";
 import useGet from "../Hook/useGet";
+import { useHistory } from "react-router-dom";
 
 const Kategori = () => {
   const [pesan, setPesan] = useState("");
@@ -17,6 +18,11 @@ const Kategori = () => {
   } = useForm();
 
   const [isi] = useGet("/kategori");
+  let history = useHistory();
+
+  if (sessionStorage.getItem("level") != "admin") {
+    return history.goBack();
+  }
 
   function simpan(data) {
     if (pilihan) {

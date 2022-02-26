@@ -8,6 +8,10 @@ const Menu = () => {
   const [isi] = useGet("/menu");
   const { hapus, pesan, setPesan } = useDelete("/menu/");
   const [kategori, setKategori] = useState([]);
+  const [gambar, setGambar] = useState([]);
+  const [idkategori, setIdkategori] = useState([]);
+  const [pilihan, setPilihan] = useState(true);
+  const [idmenu, setIdmenu] = useState("true");
 
   let no = 1;
 
@@ -44,8 +48,28 @@ const Menu = () => {
     formData.append("menu", data.menu);
     formData.append("harga", data.harga);
     formData.append("gambar", data.gambar[0]);
-    link.post("/menu", formData).then((res) => setPesan(res.data.pesan));
+
+    if (pilihan) {
+      link.post("/menu", formData).then((res) => setPesan(res.data.pesan));
+    } else {
+      link
+        .post("/menu/" + idmenu, formData)
+        .then((res) => setPesan(res.data.pesan));
+      setPilihan(true);
+    }
+
     reset();
+  }
+
+  async function showData(id) {
+    const res = await link.get("/menu/" + id);
+    // console.log(res.data);
+    setValue("menu", res.data[0].menu);
+    setValue("harga", res.data[0].harga);
+    setGambar(<img src={res.data[0].gambar} alt="" width="250" height="250" />);
+    setIdkategori(res.data[0].idkategori);
+    setIdmenu(res.data[0].idmenu);
+    setPilihan(false);
   }
 
   return (
@@ -73,11 +97,17 @@ const Menu = () => {
                 id="kategori"
                 {...register("idkategori", { required: true })}
               >
-                {kategori.map((val, index) => (
-                  <option key={index} value={val.idkategori}>
-                    {val.kategori}
-                  </option>
-                ))}
+                {kategori.map((val, index) =>
+                  val.idkategori === idkategori ? (
+                    <option key={index} selected value={val.idkategori}>
+                      {val.kategori}
+                    </option>
+                  ) : (
+                    <option key={index} value={val.idkategori}>
+                      {val.kategori}
+                    </option>
+                  )
+                )}
               </select>
             </div>
             <div className="mb-3">
@@ -125,6 +155,7 @@ const Menu = () => {
             </div>
           </form>
         </div>
+        <div className="col-6">{gambar}</div>
       </div>
 
       <div className="row">
@@ -136,7 +167,7 @@ const Menu = () => {
               <th>Menu</th>
               <th>Gambar</th>
               <th>Harga</th>
-              <th>Hapus</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -151,10 +182,16 @@ const Menu = () => {
                 <td>{val.harga}</td>
                 <td>
                   <button
-                    className="btn btn-danger"
+                    className="btn btn-danger me-2"
                     onClick={() => hapus(val.idmenu)}
                   >
                     Hapus
+                  </button>
+                  <button
+                    className="btn btn-warning"
+                    onClick={() => showData(val.idmenu)}
+                  >
+                    Ubah
                   </button>
                 </td>
               </tr>
